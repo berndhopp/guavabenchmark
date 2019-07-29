@@ -8,7 +8,7 @@ public class RandomInputStream extends InputStream {
   private final int maxSize;
   private final Random random;
 
-  public RandomInputStream(int seed, int maxSize) {
+  RandomInputStream(int seed, int maxSize) {
     this.random = new Random(seed);
     this.maxSize = maxSize;
   }
