@@ -18,8 +18,10 @@ import org.openjdk.jmh.runner.RunnerException;
 
 @State(Scope.Benchmark)
 public class CopyToBenchmark {
-  //any insanely high number of threads will do
-  private static final int THREADS = 16384;
+
+  private static final int THREADS = 10000;
+  private static final int ITERATIONS = 10000;
+  private CopyToCallable copyToCallable;
   private List<CopyToCallable> callables;
   private ExecutorService executorService;
 
@@ -30,13 +32,21 @@ public class CopyToBenchmark {
   @Setup(Invocation)
   public void setup(){
     callables = range(0, THREADS).mapToObj(i -> new CopyToCallable()).collect(toList());
+    copyToCallable = callables.get(0);
     executorService = newFixedThreadPool(THREADS);
   }
 
   @Benchmark
-  public void testCopy() throws InterruptedException {
+  public void testCopyMultiThreaded() throws InterruptedException {
     executorService.invokeAll(callables);
     executorService.shutdown();
     executorService.awaitTermination(12, HOURS);
+  }
+
+  @Benchmark
+  public void testCopy() throws Exception {
+    for (int i = 0; i < ITERATIONS; i++) {
+      copyToCallable.call();
+    }
   }
 }
